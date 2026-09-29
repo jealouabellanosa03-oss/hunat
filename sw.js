@@ -1,66 +1,21 @@
 /* ============================================================
    BOARDINGPAY SERVICE WORKER
-   Offline Cache / App Support
+   Runtime Cache / Offline Support
 ============================================================ */
 
-const CACHE_NAME = "boardingpay-v3";
+const CACHE_NAME = "boardingpay-v4";
 
 /*
    ============================================================
    CORE FILES
-   These files MUST exist.
+   These are the only files cached during installation.
    ============================================================
 */
 
 const CORE_FILES = [
     "./",
-    "./index.html"
-];
-
-
-/*
-   ============================================================
-   OPTIONAL APP FILES
-   Based on the ACTUAL files in the repository.
-   ============================================================
-*/
-
-const OPTIONAL_FILES = [
-
-    /* Main Pages */
-    "./get-started.html",
-    "./login.html",
-
-    /* Admin */
-    "./admin-register.html",
-    "./create-account.html",
-    "./admin-dashboard.html",
-
-    /* Landlord */
-    "./landlord-register.html",
-    "./landlord-dashboard.html",
-
-    /* Tenant */
-    "./tenant-register.html",
-    "./tenant-dashboard.html",
-
-    /* Payments */
-    "./paymentmethod.html",
-    "./payment-details.html",
-    "./payment-success.html",
-
-    /* Other Pages */
-    "./profile.html",
-    "./settings.html",
-    "./history.html",
-    "./announcements.html",
-    "./contact.html",
-    "./forgot-password.html",
-
-    /* CSS */
+    "./index.html",
     "./style.css",
-
-    /* JavaScript */
     "./script.js"
 ];
 
@@ -86,10 +41,6 @@ self.addEventListener("install", event => {
                     "[BoardingPay SW] Caching core files..."
                 );
 
-                /*
-                   Core files must work.
-                */
-
                 for (const file of CORE_FILES) {
 
                     try {
@@ -108,13 +59,13 @@ self.addEventListener("install", event => {
                             );
 
                             console.log(
-                                "[BoardingPay SW] Cached core:",
+                                "[BoardingPay SW] Core cached:",
                                 file
                             );
 
                         } else {
 
-                            console.error(
+                            console.warn(
                                 "[BoardingPay SW] Core file failed:",
                                 file,
                                 response.status
@@ -124,66 +75,8 @@ self.addEventListener("install", event => {
 
                     } catch (error) {
 
-                        console.error(
-                            "[BoardingPay SW] Core file error:",
-                            file,
-                            error
-                        );
-
-                    }
-
-                }
-
-
-                /*
-                   Optional files are cached one by one.
-                   If one file is missing, installation
-                   will NOT fail.
-                */
-
-                console.log(
-                    "[BoardingPay SW] Caching optional files..."
-                );
-
-
-                for (const file of OPTIONAL_FILES) {
-
-                    try {
-
-                        const response = await fetch(
-                            new Request(file, {
-                                cache: "no-cache"
-                            })
-                        );
-
-
-                        if (response.ok) {
-
-                            await cache.put(
-                                file,
-                                response.clone()
-                            );
-
-                            console.log(
-                                "[BoardingPay SW] Cached:",
-                                file
-                            );
-
-                        } else {
-
-                            console.warn(
-                                "[BoardingPay SW] Skipped:",
-                                file,
-                                "Status:",
-                                response.status
-                            );
-
-                        }
-
-                    } catch (error) {
-
                         console.warn(
-                            "[BoardingPay SW] Could not cache:",
+                            "[BoardingPay SW] Core file could not be cached:",
                             file,
                             error
                         );
@@ -191,7 +84,6 @@ self.addEventListener("install", event => {
                     }
 
                 }
-
 
                 console.log(
                     "[BoardingPay SW] Installation complete."
@@ -202,20 +94,10 @@ self.addEventListener("install", event => {
             .then(() => {
 
                 /*
-                   Activate the new service worker
-                   immediately.
+                   Activate immediately.
                 */
 
                 return self.skipWaiting();
-
-            })
-
-            .catch(error => {
-
-                console.error(
-                    "[BoardingPay SW] Installation failed:",
-                    error
-                );
 
             })
 
@@ -279,10 +161,6 @@ self.addEventListener("activate", event => {
                     "[BoardingPay SW] Activation complete."
                 );
 
-                /*
-                   Take control of all open pages.
-                */
-
                 return self.clients.claim();
 
             })
@@ -294,7 +172,7 @@ self.addEventListener("activate", event => {
 
 /* ============================================================
    FETCH
-   CACHE FIRST → NETWORK → OFFLINE FALLBACK
+   RUNTIME CACHE
 ============================================================ */
 
 self.addEventListener("fetch", event => {
@@ -307,7 +185,9 @@ self.addEventListener("fetch", event => {
     */
 
     if (request.method !== "GET") {
+
         return;
+
     }
 
 
@@ -319,7 +199,7 @@ self.addEventListener("fetch", event => {
 
                 /*
                    =================================================
-                   1. USE CACHE FIRST
+                   1. CACHE HIT
                    =================================================
                 */
 
@@ -337,7 +217,8 @@ self.addEventListener("fetch", event => {
 
                 /*
                    =================================================
-                   2. TRY NETWORK
+                   2. NO CACHE
+                   TRY NETWORK
                    =================================================
                 */
 
@@ -360,18 +241,37 @@ self.addEventListener("fetch", event => {
 
 
                             caches.open(CACHE_NAME)
+
                                 .then(cache => {
 
                                     cache.put(
                                         request,
                                         responseClone
-                                    );
+                                    )
+                                    .then(() => {
+
+                                        console.log(
+                                            "[BoardingPay SW] Runtime cached:",
+                                            request.url
+                                        );
+
+                                    })
+                                    .catch(error => {
+
+                                        console.warn(
+                                            "[BoardingPay SW] Runtime cache failed:",
+                                            request.url,
+                                            error
+                                        );
+
+                                    });
 
                                 })
+
                                 .catch(error => {
 
                                     console.warn(
-                                        "[BoardingPay SW] Cache put failed:",
+                                        "[BoardingPay SW] Cache open failed:",
                                         error
                                     );
 
@@ -406,9 +306,15 @@ self.addEventListener("fetch", event => {
                             return caches.match(
                                 "./index.html"
                             )
+
                             .then(indexResponse => {
 
                                 if (indexResponse) {
+
+                                    console.log(
+                                        "[BoardingPay SW] Offline fallback:",
+                                        "./index.html"
+                                    );
 
                                     return indexResponse;
 
@@ -416,8 +322,7 @@ self.addEventListener("fetch", event => {
 
 
                                 /*
-                                   If even index.html is unavailable,
-                                   return an offline page.
+                                   No index cache available.
                                 */
 
                                 return new Response(
@@ -426,10 +331,12 @@ self.addEventListener("fetch", event => {
 
                                     {
                                         status: 200,
+
                                         headers: {
                                             "Content-Type":
                                                 "text/html; charset=UTF-8"
                                         }
+
                                     }
 
                                 );
@@ -441,20 +348,17 @@ self.addEventListener("fetch", event => {
 
                         /*
                            =================================================
-                           4. NON-DOCUMENT OFFLINE RESPONSE
+                           4. NON-DOCUMENT RESOURCE
                            =================================================
                         */
 
                         return new Response(
-
                             "",
-
                             {
-                                status: 404,
+                                status: 503,
                                 statusText:
-                                    "Offline resource not cached"
+                                    "Offline resource unavailable"
                             }
-
                         );
 
                     });
@@ -467,7 +371,7 @@ self.addEventListener("fetch", event => {
 
 
 /* ============================================================
-   OFFLINE PAGE
+   OFFLINE FALLBACK PAGE
 ============================================================ */
 
 function offlinePage() {
@@ -484,6 +388,11 @@ function offlinePage() {
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#ffffff"
     >
 
     <title>BoardingPay - Offline</title>
@@ -514,90 +423,102 @@ function offlinePage() {
                 sans-serif;
 
             background:
-                #f7f7f7;
+                linear-gradient(
+                    145deg,
+                    #eaf6ff,
+                    #f8fcff,
+                    #eef8ff
+                );
 
-            color:
-                #333;
+            color: #073f78;
 
             text-align: center;
 
         }
 
+
         .offline-box {
 
             width: 100%;
 
-            max-width: 450px;
+            max-width: 420px;
 
-            background:
-                #ffffff;
+            background: #ffffff;
 
             padding: 35px 25px;
 
-            border-radius: 18px;
+            border-radius: 20px;
 
             box-shadow:
-                0 10px 30px
-                rgba(0, 0, 0, 0.10);
+                0 10px 35px
+                rgba(7, 63, 120, 0.12);
 
         }
 
+
         .offline-icon {
 
-            font-size: 55px;
+            font-size: 52px;
 
             margin-bottom: 15px;
 
         }
 
+
         h1 {
 
             margin:
-                0 0 10px;
+                0 0 12px;
 
-            font-size: 26px;
+            font-size: 27px;
+
+            color: #073f78;
 
         }
+
 
         p {
 
             margin:
-                0 0 22px;
+                0 0 24px;
 
             line-height: 1.6;
 
-            color:
-                #666;
+            color: #647b8c;
 
         }
+
 
         button {
 
             border: none;
 
             padding:
-                12px 22px;
+                13px 25px;
 
-            border-radius:
-                10px;
+            border-radius: 10px;
 
-            cursor:
-                pointer;
+            cursor: pointer;
 
-            font-size:
-                15px;
+            font-size: 15px;
+
+            font-weight: 700;
 
             background:
-                #333;
+                linear-gradient(
+                    135deg,
+                    #0aa0e8,
+                    #087dc7
+                );
 
-            color:
-                white;
+            color: #ffffff;
 
         }
 
     </style>
 
 </head>
+
 
 <body>
 
@@ -612,9 +533,9 @@ function offlinePage() {
         </h1>
 
         <p>
-            BoardingPay cannot connect to the internet
-            right now. Please check your connection
-            and try again.
+            BoardingPay is currently offline.
+            Pages that you have already opened
+            can still be accessed.
         </p>
 
         <button onclick="location.reload()">
@@ -638,13 +559,15 @@ function offlinePage() {
 self.addEventListener("message", event => {
 
     if (!event.data) {
+
         return;
+
     }
 
 
     /*
        =========================================================
-       FORCE SERVICE WORKER TO ACTIVATE
+       SKIP WAITING
        =========================================================
     */
 
@@ -654,7 +577,7 @@ self.addEventListener("message", event => {
     ) {
 
         console.log(
-            "[BoardingPay SW] Skip waiting requested."
+            "[BoardingPay SW] SKIP_WAITING requested."
         );
 
         self.skipWaiting();
@@ -664,7 +587,7 @@ self.addEventListener("message", event => {
 
     /*
        =========================================================
-       CLEAR BOARDINGPAY CACHE
+       CLEAR CACHE
        =========================================================
     */
 
@@ -674,7 +597,7 @@ self.addEventListener("message", event => {
     ) {
 
         console.log(
-            "[BoardingPay SW] Clearing caches..."
+            "[BoardingPay SW] Clearing BoardingPay caches..."
         );
 
 
@@ -687,11 +610,13 @@ self.addEventListener("message", event => {
                     return Promise.all(
 
                         cacheNames
+
                             .filter(cacheName =>
                                 cacheName.startsWith(
                                     "boardingpay-"
                                 )
                             )
+
                             .map(cacheName =>
                                 caches.delete(
                                     cacheName
@@ -705,7 +630,7 @@ self.addEventListener("message", event => {
                 .then(() => {
 
                     console.log(
-                        "[BoardingPay SW] Cache cleared."
+                        "[BoardingPay SW] BoardingPay cache cleared."
                     );
 
                 })
