@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Profile - BoardingPay</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7fbfe;
+            color: #173b63;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            margin: auto;
+            background: #ffffff;
+            padding-bottom: 90px;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            height: 58px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+
+            background: #ffffff;
+
+            border-bottom: 1px solid #edf1f4;
+        }
+
+        .header h1 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #173b63;
+        }
+
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back-btn {
+            position: absolute;
+
+            left: 10px;
+            top: 10px;
+
+            width: 38px;
+            height: 38px;
+
+            border: none;
+            border-radius: 50%;
+
+            background: transparent;
+
+            color: #657786;
+
+            font-size: 30px;
+            line-height: 1;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #f1f8fc;
+        }
+
+        .back-btn:active {
+            background: #e4f3fc;
+        }
+
+
+        /* =========================
+           PROFILE TOP
+        ========================= */
+
+        .profile-top {
+            text-align: center;
+
+            padding: 28px 20px 22px;
+
+            border-bottom: 1px solid #edf1f4;
+        }
+
+        .profile-avatar {
+            width: 76px;
+            height: 76px;
+
+            margin: 0 auto 12px;
+
+            border-radius: 50%;
+
+            background: #168bd4;
+
+            color: #ffffff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .profile-top h2 {
+            font-size: 18px;
+
+            color: #173b63;
+
+            margin-bottom: 5px;
+        }
+
+        .profile-top p {
+            font-size: 12px;
+
+            color: #657786;
+        }
+
+
+        /* =========================
+           ACCOUNT BADGE
+        ========================= */
+
+        .account-badge {
+            display: inline-block;
+
+            margin-top: 10px;
+
+            padding: 5px 12px;
+
+            border-radius: 20px;
+
+            background: #eaf6fd;
+
+            color: #168bd4;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           PROFILE CONTENT
+        ========================= */
+
+        .profile-content {
+            padding: 18px 14px;
+        }
+
+        .section-title {
+            font-size: 13px;
+
+            font-weight: bold;
+
+            color: #173b63;
+
+            margin-bottom: 10px;
+        }
+
+
+        /* =========================
+           CREDENTIAL CARD
+        ========================= */
+
+        .credential-card {
+            background: #ffffff;
+
+            border: 1px solid #edf1f4;
+
+            border-radius: 8px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 2px 8px rgba(
+                    23,
+                    59,
+                    99,
+                    0.04
+                );
+        }
+
+
+        .credential-row {
+            min-height: 58px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 11px 14px;
+
+            border-bottom:
+                1px solid #edf1f4;
+        }
+
+
+        .credential-row:last-child {
+            border-bottom: none;
+        }
+
+
+        .credential-label {
+            width: 42%;
+
+            font-size: 11px;
+
+            color: #657786;
+        }
+
+
+        .status-occupied {
+            color: #198754;
+            font-weight: 700;
+        }
+
+        .credential-value {
+            width: 58%;
+
+            text-align: right;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            color: #173b63;
+
+            word-break: break-word;
+        }
+
+
+        /* =========================
+           LOGOUT
+        ========================= */
+
+        .logout-btn {
+            width: 100%;
+
+            height: 45px;
+
+            margin-top: 20px;
+
+            border:
+                1px solid #e2e8ed;
+
+            border-radius: 6px;
+
+            background: #ffffff;
+
+            color: #d9534f;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #fff6f6;
+        }
+
+
+        /* =========================
+           BOTTOM NAVIGATION
+        ========================= */
+
+        .bottom-nav {
+            position: fixed;
+
+            left: 50%;
+            bottom: 0;
+
+            transform:
+                translateX(-50%);
+
+            width:
+                min(430px, 100%);
+
+            height: 68px;
+
+            background: #ffffff;
+
+            border-top:
+                1px solid #e6edf2;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-around;
+
+            z-index: 1000;
+        }
+
+
+        .nav-item {
+            width: 25%;
+
+            height: 100%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-decoration: none;
+
+            color: #8a9aaa;
+
+            font-size: 10px;
+
+            cursor: pointer;
+        }
+
+
+        .nav-icon {
+            font-size: 20px;
+
+            line-height: 22px;
+
+            margin-bottom: 4px;
+        }
+
+
+        .nav-item.active {
+            color: #168bd4;
+
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<main class="page">
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header class="header">
+
+        <button
+            type="button"
+            class="back-btn"
+            id="backBtn"
+            aria-label="Back to Dashboard">
+
+            ‹
+
+        </button>
+
+
+        <h1>
+            Profile
+        </h1>
+
+    </header>
+
+
+    <!-- =========================
+         PROFILE HEADER
+    ========================= -->
+
+    <section class="profile-top">
+
+        <div
+            class="profile-avatar"
+            id="profileAvatar">
+
+            U
+
+        </div>
+
+
+        <h2 id="displayName">
+            User
+        </h2>
+
+
+        <p id="displayEmail">
+            —
+        </p>
+
+
+        <span
+            class="account-badge"
+            id="accountType">
+
+            Tenant
+
+        </span>
+
+    </section>
+
+
+    <!-- =========================
+         PROFILE INFORMATION
+    ========================= -->
+
+    <section class="profile-content">
+
+
+        <h3 class="section-title">
+            Account Information
+        </h3>
+
+
+        <div class="credential-card">
+
+
+            <!-- FULL NAME -->
+
+            <div class="credential-row">
+
+                <span class="credential-label">
+                    Full Name
+                </span>
+
+
+                <span
+                    class="credential-value"
+                    id="fullName">
+
+                    —
+
+                </span>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="credential-row">
+
+                <span class="credential-label">
+                    Email
+                </span>
+
+
+                <span
+                    class="credential-value"
+                    id="email">
+
+                    —
+
+                </span>
+
+            </div>
+
+
+            <!-- PHONE -->
+
+            <div class="credential-row">
+
+                <span class="credential-label">
+                    Phone Number
+                </span>
+
+
+                <span
+                    class="credential-value"
+                    id="phone">
+
+                    —
+
+                </span>
+
+            </div>
+
+            <!-- ROOM --><!-- ROOM -->
+
+            <div class="credential-row">
+
+                <span class="credential-label">
+                    Room / House
+                </span>
+
+
+                <span
+                    class="credential-value"
+                    id="roomHouse">
+
+                    —
+
+                </span>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="credential-row">
+
+                <span class="credential-label">
+                    Status
+                </span>
+
+                <span
+                    class="credential-value"
+                    id="tenantStatus">
+
+                    Occupied
+
+                </span>
+
+            </div>
+
+
+            <!-- ACCOUNT TYPE -->
+
+            <div class="credential-row">
+
+                <span class="credential-label">
+                    Account Type
+                </span>
+
+
+                <span
+                    class="credential-value"
+                    id="accountTypeValue">
+
+                    —
+
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- LOGOUT -->
+
+        <button
+            type="button"
+            class="logout-btn"
+            id="logoutBtn">
+
+            Log Out
+
+        </button>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     BOTTOM NAVIGATION
+========================= -->
+
+<nav class="bottom-nav">
+
+
+    <!-- HOME -->
+
+    <a
+        href="tenant-dashboard.html"
+        class="nav-item">
+
+        <span class="nav-icon">
+            ⌂
+        </span>
+
+        <span>
+            Home
+        </span>
+
+    </a>
+
+
+    <!-- PAYMENT -->
+
+    <a
+        href="payment-method.html"
+        class="nav-item">
+
+        <span class="nav-icon">
+            ₱
+        </span>
+
+        <span>
+            Payment
+        </span>
+
+    </a>
+
+
+    <!-- HISTORY -->
+
+    <a
+        href="history.html"
+        class="nav-item">
+
+        <span class="nav-icon">
+            ◷
+        </span>
+
+        <span>
+            History
+        </span>
+
+    </a>
+
+
+    <!-- PROFILE -->
+
+    <a
+        href="profile.html"
+        class="nav-item active">
+
+        <span class="nav-icon">
+            ♙
+        </span>
+
+        <span>
+            Profile
+        </span>
+
+    </a>
+
+</nav>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
+
+    const $ = (id) => document.getElementById(id);
+
+    function readJSON(key, fallback = null) {
+        try {
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : fallback;
+        } catch (e) {
+            return fallback;
+        }
+    }
+
+    function normalize(value) {
+        return String(value || "").trim().toLowerCase();
+    }
+
+    function firstValue(...values) {
+        for (const value of values) {
+            if (value !== undefined && value !== null && String(value).trim() !== "") {
+                return String(value).trim();
+            }
+        }
+        return "";
+    }
+
+
+    /*
+     * Shared Tenant Data Helpers
+     * ------------------------------------------------------------
+     * All connected BoardingPay pages should use boardingPayAccounts
+     * as the primary source.  The Tenant phone is preserved in the
+     * account record so Landlord/Admin pages can automatically read it
+     * without asking the Tenant to enter it again.
+     */
+    function getTenantPhone(account) {
+        return firstValue(
+            account && account.phone,
+            account && account.phoneNumber,
+            account && account.mobile,
+            account && account.mobileNumber,
+            account && account.contactNumber,
+            account && account.contact
+        );
+    }
+
+    function getTenantName(account) {
+        return firstValue(
+            account && account.fullName,
+            account && account.name,
+            account && account.tenantName,
+            "User"
+        );
+    }
+
+    function getTenantAccountByRoom(roomId, roomNumber) {
+        const accounts = readJSON("boardingPayAccounts", []);
+        if (!Array.isArray(accounts)) return null;
+
+        const normalizedRoomId = normalize(roomId);
+        const normalizedRoomNumber = normalize(roomNumber);
+
+        return accounts.find(account => {
+            if (normalize(account.role || account.accountType) !== "tenant") {
+                return false;
+            }
+
+            const accountRoomId = normalize(firstValue(
+                account.roomId,
+                account.assignedRoomId,
+                account.selectedRoomId
+            ));
+
+            const accountRoomNumber = normalize(firstValue(
+                account.roomNumber,
+                account.room,
+                account.assignedRoom,
+                account.assignedRoomNumber
+            ));
+
+            if (normalizedRoomId && accountRoomId === normalizedRoomId) {
+                return true;
+            }
+
+            if (normalizedRoomNumber && accountRoomNumber === normalizedRoomNumber) {
+                return true;
+            }
+
+            return false;
+        }) || null;
+    }
+
+    /* Get the exact logged-in Tenant account. */
+    function getLoggedInTenantAccount() {
+        const currentUser =
+            readJSON("boardingPayCurrentUser", null) ||
+            readJSON("currentUser", null) ||
+            readJSON("currentTenant", null);
+
+        const currentEmail = firstValue(
+            localStorage.getItem("currentUserEmail"),
+            localStorage.getItem("loggedInEmail"),
+            localStorage.getItem("tenantEmail")
+        );
+
+        const currentId = firstValue(
+            localStorage.getItem("currentUserId"),
+            localStorage.getItem("currentTenantId"),
+            localStorage.getItem("loggedInTenantId"),
+            localStorage.getItem("tenantId")
+        );
+
+        const accounts = readJSON("boardingPayAccounts", []);
+
+        if (Array.isArray(accounts)) {
+            const found = accounts.find(account => {
+                if (normalize(account.role || account.accountType) !== "tenant") {
+                    return false;
+                }
+
+                const id = firstValue(
+                    account.id,
+                    account.tenantId,
+                    account.userId,
+                    account.accountId
+                );
+
+                const email = normalize(account.email);
+                const identifier = normalize(account.identifier);
+                const username = normalize(account.username);
+
+                return (
+                    (currentId && String(id) === String(currentId)) ||
+                    (currentEmail && (
+                        email === normalize(currentEmail) ||
+                        identifier === normalize(currentEmail) ||
+                        username === normalize(currentEmail)
+                    ))
+                );
+            });
+
+            if (found) {
+                return { ...found, ...(currentUser || {}) };
+            }
+        }
+
+        return currentUser;
+    }
+
+    /* Get the room selected/assigned to the Tenant. */
+    function getTenantRoom(account) {
+        const roomId = firstValue(
+            account && account.roomId,
+            account && account.assignedRoomId,
+            localStorage.getItem("currentRoomId"),
+            localStorage.getItem("selectedRoomId")
+        );
+
+        const roomNumber = firstValue(
+            account && account.roomNumber,
+            account && account.room,
+            account && account.assignedRoom,
+            localStorage.getItem("currentRoomNumber"),
+            localStorage.getItem("selectedRoom"),
+            localStorage.getItem("profileRoomHouse")
+        );
+
+        const rooms = readJSON("boardingPay_rooms", []);
+
+        if (Array.isArray(rooms)) {
+            const found =
+                rooms.find(room => {
+                    const id = firstValue(
+                        room.id,
+                        room.roomId,
+                        room.roomNumber,
+                        room.number
+                    );
+                    return roomId && String(id) === String(roomId);
+                }) ||
+                rooms.find(room => {
+                    const number = firstValue(
+                        room.roomNumber,
+                        room.room,
+                        room.number,
+                        room.name
+                    );
+                    return roomNumber && normalize(number) === normalize(roomNumber);
+                });
+
+            if (found) {
+                return firstValue(
+                    found.roomNumber,
+                    found.room,
+                    found.number,
+                    found.name,
+                    roomNumber,
+                    "—"
+                );
+            }
+        }
+
+        return roomNumber || "—";
+    }
+
+    const account = getLoggedInTenantAccount();
+
+    /*
+     * Keep the logged-in Tenant's shared session data synchronized.
+     * This does NOT overwrite the master account; it only mirrors the
+     * already-registered values for connected BoardingPay pages.
+     */
+    if (account) {
+        const sharedTenant = {
+            id: firstValue(account.id, account.tenantId, account.userId, account.accountId),
+            fullName: getTenantName(account),
+            name: getTenantName(account),
+            email: firstValue(account.email, account.identifier),
+            phone: getTenantPhone(account),
+            phoneNumber: getTenantPhone(account),
+            roomId: firstValue(account.roomId, account.assignedRoomId),
+            roomNumber: firstValue(account.roomNumber, account.room, account.assignedRoom),
+            accountType: "Tenant",
+            role: "tenant"
+        };
+
+        try {
+            localStorage.setItem("currentTenant", JSON.stringify(sharedTenant));
+            if (sharedTenant.phone) {
+                localStorage.setItem("tenantPhone", sharedTenant.phone);
+                localStorage.setItem("loggedInPhone", sharedTenant.phone);
+            }
+            if (sharedTenant.fullName) {
+                localStorage.setItem("tenantName", sharedTenant.fullName);
+            }
+            if (sharedTenant.email) {
+                localStorage.setItem("tenantEmail", sharedTenant.email);
+            }
+        } catch (e) {
+            console.warn("BoardingPay shared tenant sync failed:", e);
+        }
+    }
+
+    if (!account) {
+        $("displayName").textContent = "User";
+        $("displayEmail").textContent = "—";
+        $("fullName").textContent = "—";
+        $("email").textContent = "—";
+        $("phone").textContent = "—";
+        $("roomHouse").textContent = "—";
+        $("tenantStatus").textContent = "Available";
+        $("accountType").textContent = "Tenant";
+        $("accountTypeValue").textContent = "Tenant";
+    } else {
+        const fullName = firstValue(account.fullName, account.name, account.tenantName, "User");
+        const email = firstValue(
+            account.email,
+            account.identifier,
+            localStorage.getItem("currentUserEmail"),
+            "—"
+        );
+        const phone = getTenantPhone(account) || "—";
+        const room = getTenantRoom(account);
+
+        /*
+         * Tenant Status:
+         * A Tenant with an assigned room is considered OCCUPIED.
+         * If no room is assigned, show AVAILABLE instead.
+         */
+        const hasAssignedRoom = Boolean(
+            firstValue(
+                account.roomId,
+                account.assignedRoomId,
+                account.roomNumber,
+                account.room,
+                account.assignedRoom
+            )
+        );
+
+        const tenantStatus = hasAssignedRoom ? "Occupied" : "Available";
+
+        $("displayName").textContent = fullName;
+        $("displayEmail").textContent = email;
+        $("fullName").textContent = fullName;
+        $("email").textContent = email;
+        $("phone").textContent = phone;
+        $("roomHouse").textContent = room;
+        $("tenantStatus").textContent = tenantStatus;
+        $("tenantStatus").classList.toggle("status-occupied", tenantStatus === "Occupied");
+        $("accountType").textContent = "Tenant";
+        $("accountTypeValue").textContent = "Tenant";
+
+        const avatar = $("profileAvatar");
+        if (avatar && fullName && fullName !== "User") {
+            const parts = fullName.trim().split(/\s+/);
+            let initials = parts[0].charAt(0);
+            if (parts.length >= 2) {
+                initials += parts[parts.length - 1].charAt(0);
+            }
+            avatar.textContent = initials.toUpperCase();
+        }
+    }
+
+    const backBtn = $("backBtn");
+    if (backBtn) {
+        backBtn.addEventListener("click", function () {
+            window.location.href = "tenant-dashboard.html";
+        });
+    }
+
+    const logoutBtn = $("logoutBtn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", function () {
+            /* Remove session only. Keep the registered account and room assignment. */
+            [
+                "boardingPayCurrentUser",
+                "boardingPayLoggedIn",
+                "currentUser",
+                "loggedInUser",
+                "currentUserType",
+                "userRole",
+                "accountType",
+                "loggedInName",
+                "loggedInEmail",
+                "loggedInPhone",
+                "currentTenant",
+                "currentTenantId",
+                "loggedInTenantId",
+                "currentUserId",
+                "currentUserEmail",
+                "currentRoom",
+                "currentRoomId",
+                "currentRoomNumber",
+                "tenantEmail",
+                "tenantName",
+                "tenantPhone",
+                "selectedPaymentMethod"
+            ].forEach(key => localStorage.removeItem(key));
+
+            window.location.href = "index.html";
+        });
+    }
+
+    window.addEventListener("storage", function (event) {
+        const watchedKeys = [
+            "boardingPayAccounts",
+            "boardingPay_rooms",
+            "boardingPayCurrentUser",
+            "currentUser",
+            "currentTenant",
+            "currentTenantId",
+            "currentUserEmail",
+            "currentRoomId",
+            "currentRoomNumber",
+            "tenantPhone",
+            "tenantName",
+            "tenantEmail"
+        ];
+
+        if (watchedKeys.includes(event.key)) {
+            window.location.reload();
+        }
+    });
+});
+</script>
+
+</body>
+
+</html>
