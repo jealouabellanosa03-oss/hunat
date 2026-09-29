@@ -1,23 +1,49 @@
 /* ============================================================
    BOARDINGPAY SERVICE WORKER
-   Runtime Cache / Offline Support
+   Stable GitHub Pages Offline Support
 ============================================================ */
 
-const CACHE_NAME = "boardingpay-v4";
+const CACHE_NAME = "boardingpay-v5";
+
+
+/* ============================================================
+   GET CURRENT APP SCOPE
+============================================================ */
+
+const APP_SCOPE = self.registration.scope;
+
 
 /*
-   ============================================================
-   CORE FILES
-   These are the only files cached during installation.
-   ============================================================
+   Example:
+
+   https://jealouabellanosa03-oss.github.io/hunat/
+
+   This automatically works for the current GitHub Pages folder.
 */
 
-const CORE_FILES = [
+
+const APP_URL = new URL(
     "./",
-    "./index.html",
-    "./style.css",
-    "./script.js"
-];
+    APP_SCOPE
+).href;
+
+
+const INDEX_URL = new URL(
+    "index.html",
+    APP_SCOPE
+).href;
+
+
+const STYLE_URL = new URL(
+    "style.css",
+    APP_SCOPE
+).href;
+
+
+const SCRIPT_URL = new URL(
+    "script.js",
+    APP_SCOPE
+).href;
 
 
 /* ============================================================
@@ -38,52 +64,190 @@ self.addEventListener("install", event => {
             .then(async cache => {
 
                 console.log(
-                    "[BoardingPay SW] Caching core files..."
+                    "[BoardingPay SW] App scope:",
+                    APP_SCOPE
                 );
 
-                for (const file of CORE_FILES) {
+                console.log(
+                    "[BoardingPay SW] App URL:",
+                    APP_URL
+                );
 
-                    try {
+                console.log(
+                    "[BoardingPay SW] Index URL:",
+                    INDEX_URL
+                );
 
-                        const response = await fetch(
-                            new Request(file, {
-                                cache: "no-cache"
-                            })
+
+                /*
+                   ------------------------------------------------
+                   CACHE ROOT PAGE
+                   ------------------------------------------------
+                */
+
+                try {
+
+                    const response = await fetch(
+                        APP_URL,
+                        {
+                            cache: "no-store"
+                        }
+                    );
+
+                    if (response.ok) {
+
+                        await cache.put(
+                            APP_URL,
+                            response.clone()
                         );
 
-                        if (response.ok) {
+                        console.log(
+                            "[BoardingPay SW] Cached app:",
+                            APP_URL
+                        );
 
-                            await cache.put(
-                                file,
-                                response.clone()
-                            );
-
-                            console.log(
-                                "[BoardingPay SW] Core cached:",
-                                file
-                            );
-
-                        } else {
-
-                            console.warn(
-                                "[BoardingPay SW] Core file failed:",
-                                file,
-                                response.status
-                            );
-
-                        }
-
-                    } catch (error) {
+                    } else {
 
                         console.warn(
-                            "[BoardingPay SW] Core file could not be cached:",
-                            file,
-                            error
+                            "[BoardingPay SW] App request failed:",
+                            response.status
                         );
 
                     }
 
+                } catch (error) {
+
+                    console.warn(
+                        "[BoardingPay SW] App could not be cached:",
+                        error
+                    );
+
                 }
+
+
+                /*
+                   ------------------------------------------------
+                   CACHE INDEX
+                   ------------------------------------------------
+                */
+
+                try {
+
+                    const response = await fetch(
+                        INDEX_URL,
+                        {
+                            cache: "no-store"
+                        }
+                    );
+
+                    if (response.ok) {
+
+                        await cache.put(
+                            INDEX_URL,
+                            response.clone()
+                        );
+
+                        console.log(
+                            "[BoardingPay SW] Cached index:",
+                            INDEX_URL
+                        );
+
+                    } else {
+
+                        console.warn(
+                            "[BoardingPay SW] Index request failed:",
+                            response.status
+                        );
+
+                    }
+
+                } catch (error) {
+
+                    console.warn(
+                        "[BoardingPay SW] Index could not be cached:",
+                        error
+                    );
+
+                }
+
+
+                /*
+                   ------------------------------------------------
+                   CACHE CSS
+                   ------------------------------------------------
+                */
+
+                try {
+
+                    const response = await fetch(
+                        STYLE_URL,
+                        {
+                            cache: "no-store"
+                        }
+                    );
+
+                    if (response.ok) {
+
+                        await cache.put(
+                            STYLE_URL,
+                            response.clone()
+                        );
+
+                        console.log(
+                            "[BoardingPay SW] Cached CSS:",
+                            STYLE_URL
+                        );
+
+                    }
+
+                } catch (error) {
+
+                    console.warn(
+                        "[BoardingPay SW] CSS not cached:",
+                        error
+                    );
+
+                }
+
+
+                /*
+                   ------------------------------------------------
+                   CACHE JAVASCRIPT
+                   ------------------------------------------------
+                */
+
+                try {
+
+                    const response = await fetch(
+                        SCRIPT_URL,
+                        {
+                            cache: "no-store"
+                        }
+                    );
+
+                    if (response.ok) {
+
+                        await cache.put(
+                            SCRIPT_URL,
+                            response.clone()
+                        );
+
+                        console.log(
+                            "[BoardingPay SW] Cached JS:",
+                            SCRIPT_URL
+                        );
+
+                    }
+
+                } catch (error) {
+
+                    console.warn(
+                        "[BoardingPay SW] JS not cached:",
+                        error
+                    );
+
+                }
+
 
                 console.log(
                     "[BoardingPay SW] Installation complete."
@@ -92,10 +256,6 @@ self.addEventListener("install", event => {
             })
 
             .then(() => {
-
-                /*
-                   Activate immediately.
-                */
 
                 return self.skipWaiting();
 
@@ -126,7 +286,6 @@ self.addEventListener("activate", event => {
                 return Promise.all(
 
                     cacheNames
-
                         .filter(cacheName => {
 
                             return (
@@ -172,7 +331,7 @@ self.addEventListener("activate", event => {
 
 /* ============================================================
    FETCH
-   RUNTIME CACHE
+   NETWORK + RUNTIME CACHE
 ============================================================ */
 
 self.addEventListener("fetch", event => {
@@ -181,13 +340,11 @@ self.addEventListener("fetch", event => {
 
 
     /*
-       Only handle GET requests.
+       Only GET requests.
     */
 
     if (request.method !== "GET") {
-
         return;
-
     }
 
 
@@ -198,9 +355,9 @@ self.addEventListener("fetch", event => {
             .then(cachedResponse => {
 
                 /*
-                   =================================================
-                   1. CACHE HIT
-                   =================================================
+                   ------------------------------------------------
+                   CACHE HIT
+                   ------------------------------------------------
                 */
 
                 if (cachedResponse) {
@@ -216,10 +373,9 @@ self.addEventListener("fetch", event => {
 
 
                 /*
-                   =================================================
-                   2. NO CACHE
-                   TRY NETWORK
-                   =================================================
+                   ------------------------------------------------
+                   NETWORK
+                   ------------------------------------------------
                 */
 
                 return fetch(request)
@@ -227,7 +383,8 @@ self.addEventListener("fetch", event => {
                     .then(networkResponse => {
 
                         /*
-                           Only cache successful responses.
+                           Save successful same-origin
+                           responses.
                         */
 
                         if (
@@ -236,17 +393,16 @@ self.addEventListener("fetch", event => {
                             networkResponse.type === "basic"
                         ) {
 
-                            const responseClone =
+                            const clone =
                                 networkResponse.clone();
 
 
                             caches.open(CACHE_NAME)
-
                                 .then(cache => {
 
                                     cache.put(
                                         request,
-                                        responseClone
+                                        clone
                                     )
                                     .then(() => {
 
@@ -255,25 +411,7 @@ self.addEventListener("fetch", event => {
                                             request.url
                                         );
 
-                                    })
-                                    .catch(error => {
-
-                                        console.warn(
-                                            "[BoardingPay SW] Runtime cache failed:",
-                                            request.url,
-                                            error
-                                        );
-
                                     });
-
-                                })
-
-                                .catch(error => {
-
-                                    console.warn(
-                                        "[BoardingPay SW] Cache open failed:",
-                                        error
-                                    );
 
                                 });
 
@@ -294,35 +432,52 @@ self.addEventListener("fetch", event => {
 
 
                         /*
-                           =================================================
-                           3. OFFLINE DOCUMENT FALLBACK
-                           =================================================
+                           ------------------------------------------------
+                           OFFLINE NAVIGATION
+                           ------------------------------------------------
                         */
 
                         if (
+                            request.mode === "navigate" ||
                             request.destination === "document"
                         ) {
 
                             return caches.match(
-                                "./index.html"
+                                request
                             )
+                            .then(response => {
 
-                            .then(indexResponse => {
+                                if (response) {
 
-                                if (indexResponse) {
-
-                                    console.log(
-                                        "[BoardingPay SW] Offline fallback:",
-                                        "./index.html"
-                                    );
-
-                                    return indexResponse;
+                                    return response;
 
                                 }
 
 
                                 /*
-                                   No index cache available.
+                                   Try current app root.
+                                */
+
+                                return caches.match(
+                                    APP_URL
+                                );
+
+                            })
+                            .then(response => {
+
+                                if (response) {
+
+                                    console.log(
+                                        "[BoardingPay SW] Offline page served from cache."
+                                    );
+
+                                    return response;
+
+                                }
+
+
+                                /*
+                                   Last fallback.
                                 */
 
                                 return new Response(
@@ -347,9 +502,7 @@ self.addEventListener("fetch", event => {
 
 
                         /*
-                           =================================================
-                           4. NON-DOCUMENT RESOURCE
-                           =================================================
+                           Non-document resources.
                         */
 
                         return new Response(
@@ -371,7 +524,7 @@ self.addEventListener("fetch", event => {
 
 
 /* ============================================================
-   OFFLINE FALLBACK PAGE
+   OFFLINE PAGE
 ============================================================ */
 
 function offlinePage() {
@@ -390,11 +543,6 @@ function offlinePage() {
         content="width=device-width, initial-scale=1.0"
     >
 
-    <meta
-        name="theme-color"
-        content="#ffffff"
-    >
-
     <title>BoardingPay - Offline</title>
 
     <style>
@@ -404,17 +552,11 @@ function offlinePage() {
         }
 
         body {
-
             margin: 0;
-
             min-height: 100vh;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             padding: 20px;
 
             font-family:
@@ -431,16 +573,11 @@ function offlinePage() {
                 );
 
             color: #073f78;
-
-            text-align: center;
-
         }
-
 
         .offline-box {
 
             width: 100%;
-
             max-width: 420px;
 
             background: #ffffff;
@@ -449,45 +586,28 @@ function offlinePage() {
 
             border-radius: 20px;
 
+            text-align: center;
+
             box-shadow:
                 0 10px 35px
                 rgba(7, 63, 120, 0.12);
-
         }
-
 
         .offline-icon {
-
             font-size: 52px;
-
             margin-bottom: 15px;
-
         }
-
 
         h1 {
-
-            margin:
-                0 0 12px;
-
-            font-size: 27px;
-
+            margin: 0 0 12px;
             color: #073f78;
-
         }
-
 
         p {
-
-            margin:
-                0 0 24px;
-
+            margin: 0 0 24px;
             line-height: 1.6;
-
             color: #647b8c;
-
         }
-
 
         button {
 
@@ -512,13 +632,11 @@ function offlinePage() {
                 );
 
             color: #ffffff;
-
         }
 
     </style>
 
 </head>
-
 
 <body>
 
@@ -534,8 +652,8 @@ function offlinePage() {
 
         <p>
             BoardingPay is currently offline.
-            Pages that you have already opened
-            can still be accessed.
+            Please reconnect to the internet
+            and try again.
         </p>
 
         <button onclick="location.reload()">
@@ -559,16 +677,12 @@ function offlinePage() {
 self.addEventListener("message", event => {
 
     if (!event.data) {
-
         return;
-
     }
 
 
     /*
-       =========================================================
        SKIP WAITING
-       =========================================================
     */
 
     if (
@@ -586,9 +700,7 @@ self.addEventListener("message", event => {
 
 
     /*
-       =========================================================
        CLEAR CACHE
-       =========================================================
     */
 
     if (
@@ -597,9 +709,8 @@ self.addEventListener("message", event => {
     ) {
 
         console.log(
-            "[BoardingPay SW] Clearing BoardingPay caches..."
+            "[BoardingPay SW] Clearing cache..."
         );
-
 
         event.waitUntil(
 
@@ -630,7 +741,7 @@ self.addEventListener("message", event => {
                 .then(() => {
 
                     console.log(
-                        "[BoardingPay SW] BoardingPay cache cleared."
+                        "[BoardingPay SW] Cache cleared."
                     );
 
                 })
